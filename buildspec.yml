@@ -3,16 +3,20 @@ version: 0.2
 phases:
   install:
     commands:
-      # install yarn
-      - sudo apt-get update -y && sudo apt-get install -y yarn
+      - |
+        # Yarn installation
+        curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+        echo "deb http://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+        sudo apt-get -y update
+        apt-get install -y yarn      
+      
+        # Install dependencies needed for running tests
+        yarn install
 
-      # Install dependencies needed for running tests
-      - yarn install
-
-      # Upgrade AWS CLI to the latest version
-      #- pip install --upgrade awscli
-      # due to https://github.com/aws/aws-cli/issues/4087 use 1.16.141
-      - pip install awscli==1.16.141
+        # Upgrade AWS CLI to the latest version
+        #- pip install --upgrade awscli
+        # due to https://github.com/aws/aws-cli/issues/4087 use 1.16.141
+        pip install awscli==1.16.141
 
   pre_build:
     commands:
