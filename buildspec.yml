@@ -3,6 +3,9 @@ version: 0.2
 phases:
   install:
     commands:
+      # install yarn
+      - sudo apt-get update -y && sudo apt-get install -y yarn
+
       # Install dependencies needed for running tests
       - yarn install
 
