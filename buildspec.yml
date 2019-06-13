@@ -1,0 +1,40 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      # Install dependencies needed for running tests
+      - yarn install
+
+      # Upgrade AWS CLI to the latest version
+      #- pip install --upgrade awscli
+      # due to https://github.com/aws/aws-cli/issues/4087 use 1.16.141
+      - pip install awscli==1.16.141
+
+  pre_build:
+    commands:
+      - yarn test
+      
+  build:
+    commands:
+      - aws s3 cp swagger.yml s3://$S3_BUCKET/swagger.yml
+
+      # Use AWS SAM to package the application using AWS CloudFormation
+      - aws cloudformation package --template template.yml --s3-bucket $S3_BUCKET --output-template template-output.yml
+
+  post_build:
+    commands:
+      - |
+        # cleanup output if already exists
+        rm -rf output
+        mkdir output
+
+        # if build successful copy artifacts to output
+        if [ $CODEBUILD_BUILD_SUCCEEDING -eq 1 ]; then 
+          cp template-output.yml output/
+        fi
+
+artifacts:
+  type: zip
+  files:
+    - output/template-output.yml

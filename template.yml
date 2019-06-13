@@ -1,0 +1,111 @@
+# Serverless Application Model (SAM) definitions
+
+AWSTemplateFormatVersion: '2010-09-09'
+Transform:
+- 'AWS::Serverless-2016-10-31'
+
+Description:
+  Creates a RESTful API using API Gateway and Lambda
+
+Globals:
+  Function:
+    Runtime: nodejs8.10
+    Timeout: 60
+    Tags:
+      stage:
+        Ref: StageName
+
+Parameters:
+  # CodeDeployRole:
+  #   Type: String
+  #   Description: IAM role to allow AWS CodeDeploy to manage deployment of AWS Lambda functions
+  StageName:
+    Type: String
+    Default: dev
+    Description: The Lambda Function Stage
+  S3BucketName:
+    Type: String
+    Description: The name of the S3 bucket in which the Swagger specification can be found.
+
+Resources:
+
+  RestApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name:
+        Fn::Sub: aws-sam-ref-api-${StageName}
+      StageName:
+        Ref: StageName
+      DefinitionBody:
+        Fn::Transform:
+          Name: AWS::Include
+          Parameters:
+            Location:
+              Fn::Join:
+                - ''
+                - - 's3://'
+                  - Ref: S3BucketName
+                  - '/swagger.yml'
+  
+  SearchInventory:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      FunctionName: 'searchInventory'
+      Runtime: nodejs8.10
+      CodeUri: inventory
+      Handler: index.searchInventory
+      Description: Search Inventory
+      Timeout: 10
+      Events:
+        GET:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RestApi
+            Path: /inventory
+            Method: get
+      Role: !GetAtt LambdaExecutionRole.Arn
+
+  AddInventory:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      FunctionName: 'addInventory'
+      Runtime: nodejs8.10
+      CodeUri: inventory
+      Handler: index.addInventory
+      Description: Adds inventory
+      Timeout: 10
+      Events:
+        POST:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: RestApi
+            Path: /inventory
+            Method: post
+      Role: !GetAtt LambdaExecutionRole.Arn
+
+  LambdaExecutionRole:
+    Description: Creating service role in IAM for AWS Lambda
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub 'aws-sam-ref-api-Execution-${StageName}'
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [lambda.amazonaws.com]
+          Action: sts:AssumeRole
+      Path: /
+      ManagedPolicyArns:
+        -  arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+#      PermissionsBoundary: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:policy/CodeStar_${ProjectId}_PermissionsBoundary'
+
+Outputs:
+  ApiUrl:
+    Value:
+      Fn::Join:
+        - ""
+        - - "https://"
+          - Ref: RestApi
+          - Fn::Sub: ".execute-api.${AWS::Region}.amazonaws.com/dev"      
