@@ -33,7 +33,7 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       Name:
-        Fn::Sub: aws-sam-ref-api-${StageName}
+        Fn::Sub: demo-lambda-${StageName}
       StageName:
         Ref: StageName
       DefinitionBody:
@@ -89,7 +89,7 @@ Resources:
     Description: Creating service role in IAM for AWS Lambda
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub 'aws-sam-ref-api-Execution-${StageName}'
+      RoleName: !Sub 'demo-lambda-Execution-${StageName}'
       AssumeRolePolicyDocument:
         Statement:
         - Effect: Allow
