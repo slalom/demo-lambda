@@ -29,19 +29,19 @@ phases:
       # Use AWS SAM to package the application using AWS CloudFormation
       - aws cloudformation package --template template.yml --s3-bucket $S3_BUCKET --output-template template-output.yml
 
-  post_build:
-    commands:
-      - |
-        # cleanup output if already exists
-        rm -rf output
-        mkdir output
+  # post_build:
+  #   commands:
+  #     - |
+  #       # cleanup output if already exists
+  #       rm -rf output
+  #       mkdir output
 
-        # if build successful copy artifacts to output
-        if [ $CODEBUILD_BUILD_SUCCEEDING -eq 1 ]; then 
-          cp template-output.yml output/
-        fi
+  #       # if build successful copy artifacts to output
+  #       if [ $CODEBUILD_BUILD_SUCCEEDING -eq 1 ]; then 
+  #         cp template-output.yml output/
+  #       fi
 
 artifacts:
   type: zip
   files:
-    - output/template-output.yml
+    - template-output.yml
