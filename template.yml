@@ -19,6 +19,9 @@ Parameters:
   # CodeDeployRole:
   #   Type: String
   #   Description: IAM role to allow AWS CodeDeploy to manage deployment of AWS Lambda functions
+  RepositoryName:
+    Type: String
+    Description: Name of the git repo being deployed
   StageName:
     Type: String
     Default: dev
@@ -33,7 +36,7 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       Name:
-        Fn::Sub: demo-lambda-${StageName}
+        Fn::Sub: ${RepositoryName}-${StageName}
       StageName:
         Ref: StageName
       DefinitionBody:
@@ -89,7 +92,7 @@ Resources:
     Description: Creating service role in IAM for AWS Lambda
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub 'demo-lambda-Execution-${StageName}'
+      RoleName: !Sub '${RepositoryName}-Execution-${StageName}'
       AssumeRolePolicyDocument:
         Statement:
         - Effect: Allow
@@ -99,7 +102,6 @@ Resources:
       Path: /
       ManagedPolicyArns:
         -  arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-#      PermissionsBoundary: !Sub 'arn:${AWS::Partition}:iam::${AWS::AccountId}:policy/CodeStar_${ProjectId}_PermissionsBoundary'
 
 Outputs:
   ApiUrl:
