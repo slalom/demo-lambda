@@ -50,10 +50,10 @@ Resources:
                   - Ref: S3BucketName
                   - '/swagger.yml'
   
-  SearchInventory:
+  SearchInventoryDemo:
     Type: 'AWS::Serverless::Function'
     Properties:
-      FunctionName: 'searchInventory'
+      FunctionName: 'searchInventoryDemo'
       Runtime: nodejs8.10
       CodeUri: inventory
       Handler: index.searchInventory
@@ -69,10 +69,10 @@ Resources:
             Method: get
       Role: !GetAtt LambdaExecutionRole.Arn
 
-  AddInventory:
+  AddInventoryDemo:
     Type: 'AWS::Serverless::Function'
     Properties:
-      FunctionName: 'addInventory'
+      FunctionName: 'addInventoryDemo'
       Runtime: nodejs8.10
       CodeUri: inventory
       Handler: index.addInventory

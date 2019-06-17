@@ -67,7 +67,7 @@ paths:
           description: bad input parameter
       x-amazon-apigateway-integration:
         uri:
-          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SearchInventory.Arn}/invocations
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SearchInventoryDemo.Arn}/invocations
         responses:
           default:
             statusCode: "200"
@@ -96,7 +96,7 @@ paths:
           description: an existing item already exists
       x-amazon-apigateway-integration:
         uri:
-          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AddInventory.Arn}/invocations
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AddInventoryDemo.Arn}/invocations
         responses:
           default:
             statusCode: "200"
